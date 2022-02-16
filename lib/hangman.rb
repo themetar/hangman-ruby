@@ -1,5 +1,8 @@
 require 'bundler/setup'
 require_relative 'gamestate'
+require 'tty-prompt'
+
+prompt = TTY::Prompt.new
 
 # load word set
 lexicon = []
@@ -21,10 +24,11 @@ game = GameState.new(word)
 
 until game.game_over?
   game.ui_print
-
-  print 'Enter guess: '
   
-  guess = gets.strip
+  guess = prompt.ask 'Enter guess: ' do |q|
+            q.validate /\A[a-zA-Z]+\Z/, "Must contain only letters, one or more"
+            q.modify :trim, :down
+          end
 
   game.add_guess(guess)
 
