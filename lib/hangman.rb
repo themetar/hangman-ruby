@@ -1,3 +1,5 @@
+require_relative 'gamestate'
+
 # load word set
 lexicon = []
 
@@ -13,46 +15,26 @@ end
 # choose word
 word = lexicon[rand(lexicon.length)]
 
-# mistake counter
-mistakes = 0
+# initialize game state
+game = GameState.new(word)
 
-MAX_MISTAKES = 5
-
-guesses = []
-
-hits = 0
-
-def print_word_and_guesses(word, guesses)
-  correct, incorrect = guesses.partition { |char| word.include?(char) }
-  puts word.gsub(/./) { |char| correct.include?(char) ? char : '_' } .split('').join(' ') + "\t" + incorrect.join(', ')
-end
-
-while mistakes < MAX_MISTAKES
-  puts "#{mistakes} / #{MAX_MISTAKES}"
-
-  print_word_and_guesses(word, guesses)
+until game.game_over?
+  game.ui_print
 
   print 'Enter guess: '
   
   guess = gets.strip
 
-  guess.each_char do |char|
-    unless guesses.include?(char)
-      guesses << char
+  game.add_guess(guess)
 
-      mistakes += 1 unless word.include?(char)
-      hits +=  word.count(char)
-    end
-  end
-
-  if hits == word.length
+  if game.game_won?
     puts "Correct!"
-    print_word_and_guesses(word, guesses)
+    game.ui_print
     break
   end
 end
 
-if mistakes == MAX_MISTAKES
+unless game.game_won?
   puts "You lost. The word was:"
   puts word.split('').join(' ')
 end
