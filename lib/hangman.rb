@@ -1,3 +1,4 @@
+require 'bundler/setup'
 require_relative 'gamestate'
 
 # load word set

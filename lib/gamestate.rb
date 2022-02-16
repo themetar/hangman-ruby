@@ -1,3 +1,5 @@
+require 'pastel'
+
 # Holds and manages game state for a single round
 class GameState
   # Limit of wrong guesses
@@ -33,9 +35,25 @@ class GameState
 
   # Prints status to standard output
   def ui_print
-    puts "#{@mistakes} / #{MAX_MISTAKES}"
+    # O
+    #/|\
+    #/ \    _ _ a _ _ _ _     E, R
+
+    pastel = Pastel.new
+
+    # prepare
+    head  = " #{@mistakes > MAX_MISTAKES ? pastel.red('O') : 'O'} "
+    torso = '/|\\'.each_char.each_with_index.collect { |c, i| @mistakes - 2 > i ? pastel.red(c) : c } .join
+    legs  = "#{@mistakes > 0 ? pastel.red('/') : '/' } #{@mistakes > 1 ? pastel.red('\\') : '\\'}"
 
     correct, incorrect = @guesses.partition { |char| @word.include?(char) }
-    puts @word.gsub(/./) { |char| correct.include?(char) ? char : '_' } .split('').join(' ') + "\t" + incorrect.join(', ')
+    
+    secret = @word.gsub(/./) { |char| correct.include?(char) ? char : '_' } .split('').join(' ')
+    wrongs = pastel.red(incorrect.collect(&:upcase).join(', '))
+    
+    # print
+    puts head 
+    puts torso
+    puts "#{legs}     #{secret}     #{wrongs}"
   end
 end
