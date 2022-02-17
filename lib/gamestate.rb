@@ -63,10 +63,12 @@ class GameState
     until game_over?
       ui_print
       
-      guess = prompt.ask 'Enter guess: ' do |q|
-                q.validate /\A[a-zA-Z]+\Z/, "Must contain only letters, one or more"
+      guess = prompt.ask 'Enter guess, or # to save and exit:' do |q|
+                q.validate /\A([a-zA-Z]+|#)\Z/, "Must either be string of letters, one or more; or a single command symbol: #"
                 q.modify :trim, :down
               end
+
+      return :save if guess == '#'  # quit game
 
       add_guess(guess)
 
@@ -81,5 +83,7 @@ class GameState
       puts "You lost. The word was:"
       puts @word.split('').join(' ')
     end
+
+    game_won? ? :won : :lost  # return status
   end
 end
