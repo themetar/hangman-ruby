@@ -5,6 +5,8 @@ class GameState
   # Limit of wrong guesses
   MAX_MISTAKES = 5
 
+  attr_accessor :guesses
+
   def initialize(word)
     @word = word
     @guesses = []
