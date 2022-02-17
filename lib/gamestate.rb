@@ -56,4 +56,30 @@ class GameState
     puts torso
     puts "#{legs}     #{secret}     #{wrongs}"
   end
+
+  def run
+    prompt = TTY::Prompt.new
+
+    until game_over?
+      ui_print
+      
+      guess = prompt.ask 'Enter guess: ' do |q|
+                q.validate /\A[a-zA-Z]+\Z/, "Must contain only letters, one or more"
+                q.modify :trim, :down
+              end
+
+      add_guess(guess)
+
+      if game_won?
+        puts "Correct!"
+        ui_print
+        break
+      end 
+    end
+
+    unless game_won?
+      puts "You lost. The word was:"
+      puts @word.split('').join(' ')
+    end
+  end
 end

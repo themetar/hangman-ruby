@@ -30,28 +30,8 @@ loop do
 
     # initialize game state
     game = GameState.new(word)
-
-    until game.game_over?
-      game.ui_print
-      
-      guess = prompt.ask 'Enter guess: ' do |q|
-                q.validate /\A[a-zA-Z]+\Z/, "Must contain only letters, one or more"
-                q.modify :trim, :down
-              end
-
-      game.add_guess(guess)
-
-      if game.game_won?
-        puts "Correct!"
-        game.ui_print
-        break
-      end 
-    end
-
-    unless game.game_won?
-      puts "You lost. The word was:"
-      puts word.split('').join(' ')
-    end
+    # and run it
+    game.run
   when :exit
     break
   end
