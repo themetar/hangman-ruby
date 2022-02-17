@@ -16,30 +16,43 @@ File.open(words_filepath, 'r') do |file|
   end
 end
 
-# choose word
-word = lexicon[rand(lexicon.length)]
+# main menu
+loop do
+  command = prompt.enum_select('Main menu') do |menu|
+              menu.choice 'Play Hangman', :play
+              menu.choice 'Exit', :exit
+            end
 
-# initialize game state
-game = GameState.new(word)
+  case command
+  when :play
+    # choose word
+    word = lexicon[rand(lexicon.length)]
 
-until game.game_over?
-  game.ui_print
-  
-  guess = prompt.ask 'Enter guess: ' do |q|
-            q.validate /\A[a-zA-Z]+\Z/, "Must contain only letters, one or more"
-            q.modify :trim, :down
-          end
+    # initialize game state
+    game = GameState.new(word)
 
-  game.add_guess(guess)
+    until game.game_over?
+      game.ui_print
+      
+      guess = prompt.ask 'Enter guess: ' do |q|
+                q.validate /\A[a-zA-Z]+\Z/, "Must contain only letters, one or more"
+                q.modify :trim, :down
+              end
 
-  if game.game_won?
-    puts "Correct!"
-    game.ui_print
+      game.add_guess(guess)
+
+      if game.game_won?
+        puts "Correct!"
+        game.ui_print
+        break
+      end 
+    end
+
+    unless game.game_won?
+      puts "You lost. The word was:"
+      puts word.split('').join(' ')
+    end
+  when :exit
     break
   end
-end
-
-unless game.game_won?
-  puts "You lost. The word was:"
-  puts word.split('').join(' ')
 end
