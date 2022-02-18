@@ -3,7 +3,7 @@ require_relative 'gamestate'
 require 'tty-prompt'
 require 'time'
 
-prompt = TTY::Prompt.new
+require_relative './menu'
 
 # load word set
 lexicon = []
@@ -20,42 +20,22 @@ end
 
 saves_path = File.join(datadir_path, 'saves')
 
-# main menu
+# replay loop
 loop do
-  can_load = Dir.exist?(saves_path) && Dir.new(saves_path).each.any? { |filename| File.file?(File.join(saves_path, filename)) }
+  # show menu and get choice
+  command, opt_filepath = main_menu(saves_path)
 
-  command = prompt.enum_select('Main menu') do |menu|
-              menu.choice 'Play Hangman', :play
-              menu. choice 'Load saved game', :load if can_load
-              menu.choice 'Exit', :exit
-            end
+  break if command == :exit
 
   if command == :load
-    # choose file
-    file_path = prompt.enum_select('Choose file') do |menu|
-      Dir.new(saves_path).each do |filename|
-        next if filename == '.'
-        next if filename == '..'
-
-        timestamp = Time.strptime(filename, '%Y%m%d%H%M%S')
-        
-        data = File.open(File.join(saves_path, filename), 'rb') { |save_f| Marshal.load(save_f) }
-        menu.choice "#{GameState.secret_word(data[0], data[1]).ljust(33, ' ')}  #{timestamp.strftime('%d.%m.%Y %H:%M')}", filename
-      end
-      menu.choice 'Back to main menu', :back
-    end
-
-    next if file_path == :back
-
-    save_f = File.open(File.join(saves_path, file_path), 'rb')
-    data = Marshal.load(save_f)
-    save_f.close
+    # load saved data
+    data = File.open(File.join(saves_path, opt_filepath), 'rb') { |file| Marshal.load(file) }
 
     word, guesses = data
+
+    # setup game
     game = GameState.new(word)
     game.add_guess(guesses)
-
-    command = :play # hack
   else
     # choose word
     word = lexicon[rand(lexicon.length)]
@@ -64,24 +44,19 @@ loop do
     game = GameState.new(word)
   end
 
-  case command
-  when :play
-    # run it
-    outcome = game.run
+  # run it
+  outcome = game.run
 
-    # save game
-    if outcome == :save
-      Dir.mkdir(saves_path) unless Dir.exist?(saves_path)
+  # save game
+  if outcome == :save
+    Dir.mkdir(saves_path) unless Dir.exist?(saves_path)
 
-      data = [word, game.guesses.join] 
+    data = [word, game.guesses.join] 
 
-      filename = "#{Time.new.strftime('%Y%m%d%H%M%S')}"
+    filename = "#{Time.new.strftime('%Y%m%d%H%M%S')}"
 
-      File.open(File.join(saves_path, filename), 'wb') do |file|
-        Marshal.dump(data, file)
-      end
+    File.open(File.join(saves_path, filename), 'wb') do |file|
+      Marshal.dump(data, file)
     end
-  when :exit
-    break
   end
 end
