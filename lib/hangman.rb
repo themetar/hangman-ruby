@@ -1,6 +1,7 @@
 require 'bundler/setup'
 require_relative 'gamestate'
 require 'tty-prompt'
+require 'time'
 
 prompt = TTY::Prompt.new
 
@@ -21,7 +22,7 @@ saves_path = File.join(datadir_path, 'saves')
 
 # main menu
 loop do
-  can_load = File.exist?(File.join(saves_path, 'savefile.dat'))
+  can_load = Dir.exist?(saves_path) && Dir.new(saves_path).each.any? { |filename| File.file?(File.join(saves_path, filename)) }
 
   command = prompt.enum_select('Main menu') do |menu|
               menu.choice 'Play Hangman', :play
@@ -30,7 +31,23 @@ loop do
             end
 
   if command == :load
-    save_f = File.open(File.join(saves_path, 'savefile.dat'), 'rb')
+    # choose file
+    file_path = prompt.enum_select('Choose file') do |menu|
+      Dir.new(saves_path).each do |filename|
+        next if filename == '.'
+        next if filename == '..'
+
+        timestamp = Time.strptime(filename, '%Y%m%d%H%M%S')
+        
+        data = File.open(File.join(saves_path, filename), 'rb') { |save_f| Marshal.load(save_f) }
+        menu.choice "#{GameState.secret_word(data[0], data[1]).ljust(33, ' ')}  #{timestamp.strftime('%d.%m.%Y %H:%M')}", filename
+      end
+      menu.choice 'Back to main menu', :back
+    end
+
+    next if file_path == :back
+
+    save_f = File.open(File.join(saves_path, file_path), 'rb')
     data = Marshal.load(save_f)
     save_f.close
 
@@ -58,7 +75,9 @@ loop do
 
       data = [word, game.guesses.join] 
 
-      File.open(File.join(saves_path, 'savefile.dat'), 'wb') do |file|
+      filename = "#{Time.new.strftime('%Y%m%d%H%M%S')}"
+
+      File.open(File.join(saves_path, filename), 'wb') do |file|
         Marshal.dump(data, file)
       end
     end

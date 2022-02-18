@@ -5,6 +5,11 @@ class GameState
   # Limit of wrong guesses
   MAX_MISTAKES = 5
 
+  # format secret
+  def self.secret_word(word, guesses)
+    word.gsub(/./) { |char| guesses.include?(char) ? char : '_' } .split('').join(' ')
+  end
+
   attr_accessor :guesses
 
   def initialize(word)
@@ -50,7 +55,7 @@ class GameState
 
     correct, incorrect = @guesses.partition { |char| @word.include?(char) }
     
-    secret = @word.gsub(/./) { |char| correct.include?(char) ? char : '_' } .split('').join(' ')
+    secret = self.class.secret_word(@word, correct)
     wrongs = pastel.red(incorrect.collect(&:upcase).join(', '))
     
     # print
