@@ -33,4 +33,9 @@ module Storage
   def self.load(file_name)
     File.open(File.join(SAVES_PATH, file_name), 'rb') { |file| Marshal.load(file) }
   end
+
+  # Test if there are saved files
+  def self.can_load?
+    Dir.exist?(SAVES_PATH) && Dir.each_child(SAVES_PATH).any? { |filename| File.file?(File.join(SAVES_PATH, filename)) }
+  end
 end

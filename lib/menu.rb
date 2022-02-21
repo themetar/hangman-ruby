@@ -2,12 +2,10 @@
 def main_menu(saves_path)
   prompt = TTY::Prompt.new
 
-  can_load = Dir.exist?(saves_path) && Dir.new(saves_path).each.any? { |filename| File.file?(File.join(saves_path, filename)) }
-
   loop do
     command = prompt.enum_select('Main menu') do |menu|
       menu.choice 'Play Hangman', :play
-      menu. choice 'Load saved game', :load if can_load
+      menu. choice 'Load saved game', :load if Storage.can_load?
       menu.choice 'Exit', :exit
     end
 
