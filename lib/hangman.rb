@@ -4,21 +4,9 @@ require 'tty-prompt'
 require 'time'
 
 require_relative './menu'
+require_relative './storage'
 
-# load word set
-lexicon = []
-
-datadir_path = File.join(File.dirname(__FILE__), '_data')
-words_filepath = File.join(datadir_path, 'google-10000-english-no-swears.txt')
-
-File.open(words_filepath, 'r') do |file|
-  until file.eof?
-    word = file.readline.strip
-    lexicon << word if word.length.between?(5, 12)
-  end
-end
-
-saves_path = File.join(datadir_path, 'saves')
+saves_path = File.join(Storage::DATA_DIR_PATH, 'saves')
 
 # replay loop
 loop do
@@ -37,8 +25,8 @@ loop do
     game = GameState.new(word)
     game.add_guess(guesses)
   else
-    # choose word
-    word = lexicon[rand(lexicon.length)]
+    # randomly choose word
+    word = Storage.lexicon.sample
 
     # initialize game state
     game = GameState.new(word)
