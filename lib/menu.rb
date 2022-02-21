@@ -13,9 +13,15 @@ def main_menu
   
     # choose file
     file_path = prompt.enum_select('Choose slot') do |menu|
-      Storage.savefiles.each do |filename|
+      with_timestamp = Storage.savefiles.collect do |filename|
         timestamp = Time.strptime(filename, '%Y%m%d%H%M%S')
-        
+
+        [filename, timestamp]
+      end
+
+      sorted = with_timestamp.sort { |a, b| b[1] <=> a[1] }
+
+      sorted.each do |filename, timestamp|
         data = Storage.load(filename)
 
         menu.choice "#{GameState.secret_word(data[0], data[1]).ljust(33, ' ')}  #{timestamp.strftime('%d.%m.%Y %H:%M')}", filename
