@@ -38,4 +38,8 @@ module Storage
   def self.can_load?
     Dir.exist?(SAVES_PATH) && Dir.each_child(SAVES_PATH).any? { |filename| File.file?(File.join(SAVES_PATH, filename)) }
   end
+
+  def self.savefiles
+    Dir.each_child(SAVES_PATH)
+  end
 end

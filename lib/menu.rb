@@ -1,5 +1,5 @@
 # Displays menu
-def main_menu(saves_path)
+def main_menu
   prompt = TTY::Prompt.new
 
   loop do
@@ -13,13 +13,10 @@ def main_menu(saves_path)
   
     # choose file
     file_path = prompt.enum_select('Choose slot') do |menu|
-      Dir.new(saves_path).each do |filename|
-        next if filename == '.'
-        next if filename == '..'
-
+      Storage.savefiles.each do |filename|
         timestamp = Time.strptime(filename, '%Y%m%d%H%M%S')
         
-        data = File.open(File.join(saves_path, filename), 'rb') { |save_f| Marshal.load(save_f) }
+        data = Storage.load(filename)
 
         menu.choice "#{GameState.secret_word(data[0], data[1]).ljust(33, ' ')}  #{timestamp.strftime('%d.%m.%Y %H:%M')}", filename
       end

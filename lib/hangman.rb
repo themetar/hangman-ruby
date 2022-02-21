@@ -9,7 +9,7 @@ require_relative './storage'
 # replay loop
 loop do
   # show menu and get choice
-  command, opt_filepath = main_menu(Storage::SAVES_PATH)
+  command, opt_filepath = main_menu
 
   break if command == :exit
 
