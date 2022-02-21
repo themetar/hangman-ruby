@@ -6,18 +6,16 @@ require 'time'
 require_relative './menu'
 require_relative './storage'
 
-saves_path = File.join(Storage::DATA_DIR_PATH, 'saves')
-
 # replay loop
 loop do
   # show menu and get choice
-  command, opt_filepath = main_menu(saves_path)
+  command, opt_filepath = main_menu(Storage::SAVES_PATH)
 
   break if command == :exit
 
   if command == :load
     # load saved data
-    data = File.open(File.join(saves_path, opt_filepath), 'rb') { |file| Marshal.load(file) }
+    data = Storage.load(opt_filepath)
 
     word, guesses = data
 
@@ -37,13 +35,13 @@ loop do
 
   # save game
   if outcome == :save
-    Dir.mkdir(saves_path) unless Dir.exist?(saves_path)
+    Dir.mkdir(Storage::SAVES_PATH) unless Dir.exist?(Storage::SAVES_PATH)
 
     data = [word, game.guesses.join] 
 
     filename = "#{Time.new.strftime('%Y%m%d%H%M%S')}"
 
-    File.open(File.join(saves_path, filename), 'wb') do |file|
+    File.open(File.join(Storage::SAVES_PATH, filename), 'wb') do |file|
       Marshal.dump(data, file)
     end
   end

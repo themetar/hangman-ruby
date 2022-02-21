@@ -1,6 +1,8 @@
 module Storage
   DATA_DIR_PATH = File.join(File.dirname(__FILE__), '_data')
 
+  SAVES_PATH = File.join(Storage::DATA_DIR_PATH, 'saves')
+
   # List of eligible words
   def self.lexicon
     # create class var lexicon if not already set
@@ -16,5 +18,10 @@ module Storage
     end
 
     @@lexicon
+  end
+
+  # Loads saved data
+  def self.load(file_name)
+    File.open(File.join(SAVES_PATH, file_name), 'rb') { |file| Marshal.load(file) }
   end
 end
