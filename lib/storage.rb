@@ -20,6 +20,15 @@ module Storage
     @@lexicon
   end
 
+  # Store data
+  def self.save(data)
+    Dir.mkdir(SAVES_PATH) unless Dir.exist?(SAVES_PATH)
+
+    filename = "#{Time.new.strftime('%Y%m%d%H%M%S')}"
+
+    File.open(File.join(SAVES_PATH, filename), 'wb') { |file| Marshal.dump(data, file) }
+  end
+
   # Loads saved data
   def self.load(file_name)
     File.open(File.join(SAVES_PATH, file_name), 'rb') { |file| Marshal.load(file) }

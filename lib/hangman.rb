@@ -35,14 +35,8 @@ loop do
 
   # save game
   if outcome == :save
-    Dir.mkdir(Storage::SAVES_PATH) unless Dir.exist?(Storage::SAVES_PATH)
-
-    data = [word, game.guesses.join] 
-
-    filename = "#{Time.new.strftime('%Y%m%d%H%M%S')}"
-
-    File.open(File.join(Storage::SAVES_PATH, filename), 'wb') do |file|
-      Marshal.dump(data, file)
-    end
+    data = [word, game.guesses.join]
+    
+    Storage.save(data)
   end
 end
