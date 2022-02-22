@@ -42,4 +42,9 @@ module Storage
   def self.savefiles
     Dir.each_child(SAVES_PATH)
   end
+
+  # Deletes savefile
+  def self.delete(file_name)
+    File.delete(File.join(SAVES_PATH, file_name))
+  end
 end

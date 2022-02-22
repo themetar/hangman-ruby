@@ -39,4 +39,7 @@ loop do
     
     Storage.save(data)
   end
+
+  # delete old savefile if there was one
+  Storage.delete(opt_filepath) if command == :load
 end
