@@ -5,6 +5,9 @@ require 'time'
 
 require_relative './menu'
 require_relative './storage'
+require_relative './help'
+
+puts "\n", Help::ABOUT_GAME, "\n"
 
 # replay loop
 loop do

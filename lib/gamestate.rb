@@ -73,12 +73,19 @@ class GameState
     until game_over?
       ui_print
       
-      guess = prompt.ask 'Enter guess, or # to save and exit:' do |q|
-                q.validate /\A([a-zA-Z]+|#)\Z/, "Must either be string of letters, one or more; or a single command symbol: #"
+      guess = prompt.ask 'Enter guess, or command:', default: '?' do |q|
+                q.validate /\A([a-zA-Z]+|#|\?)\Z/, "Must either be string of letters or a single command symbol: #, ?"
                 q.modify :trim, :down
               end
 
       return :save if guess == '#'  # quit game
+
+      if guess == '?'
+        puts Help::OBJECTIVE, "\n"
+        puts Help::INPUT
+        prompt.keypress('Press any key to continue...')
+        next  # go back to start of loop
+      end
 
       add_guess(guess)
     end
