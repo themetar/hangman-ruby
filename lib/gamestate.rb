@@ -64,9 +64,12 @@ class GameState
     puts "#{legs}     #{secret}     #{wrongs}"
   end
 
+  # Runs the game loop. Asking the player for guesses, updating its state.
+  # Returns game's outcome
   def run
     prompt = TTY::Prompt.new
 
+    # game loop
     until game_over?
       ui_print
       
@@ -78,17 +81,15 @@ class GameState
       return :save if guess == '#'  # quit game
 
       add_guess(guess)
-
-      if game_won?
-        puts "Correct!"
-        ui_print
-        break
-      end 
     end
 
-    unless game_won?
-      puts "You lost. The word was:"
-      puts @word.split('').join(' ')
+    # last printout
+    ui_print
+
+    if game_won?
+      puts "Correct!"
+    else
+      puts "You lost. The word was: #{@word.split('').join(' ')}"
     end
 
     game_won? ? :won : :lost  # return status
